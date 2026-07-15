@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordByWord</title>
+    
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    
+    <script src="i18n.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo-text">
+                    <h2 data-i18n="title">WordByWord</h2>
+                    <span class="version">v1.0</span>
+                </div>
+                <button class="btn-gear" onclick="openSettingsModal()" title="Settings">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 data-i18n="musicFolder">Музыкальная папка</h3>
+                <button id="btn-select-folder" class="btn btn-primary" onclick="selectLibraryFolder()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                    </svg>
+                    <span data-i18n="selectFolder">Выбрать папку</span>
+                </button>
+                <div id="selected-folder-path" class="folder-path-display" data-i18n="folderNotSelected">Локальная папка не выбрана</div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 data-i18n="singleTrack">Одиночная обработка</h3>
+                <div id="drop-zone" class="file-zone-mini">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="color: var(--primary);">
+                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                    </svg>
+                    <span data-i18n="dragSingle">Перетащите аудио сюда</span>
+                    <input type="file" id="audio-file" accept="audio/*" onchange="handleSingleFile(this.files[0])">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 data-i18n="scanSettings">Настройки сканирования</h3>
+                <div class="setting-item">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="recursive-scan" checked onchange="reloadQueue()">
+                        <span class="checkmark"></span>
+                        <span data-i18n="recursiveScan">Сканировать вложенные папки</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label for="lrc-exist-mode" data-i18n="lrcExistMode">Если LRC файл существует:</label>
+                    <select id="lrc-exist-mode" class="input-number" style="width: 100%;">
+                        <option value="upgrade-flat">Обновить до послогового</option>
+                        <option value="skip-all">Пропустить (не изменять)</option>
+                        <option value="overwrite">Всегда перезаписывать</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="request-delay" data-i18n="requestDelay">Задержка запросов (сек):</label>
+                    <input type="number" id="request-delay" value="1.5" min="0.5" step="0.1" class="input-number">
+                </div>
+                <div class="setting-item">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <label for="default-artist" data-i18n="defaultArtist">Исполнитель по умолчанию:</label>
+                        <span id="default-artist-tooltip" class="info-icon" title="Used when the artist cannot be determined from tags or folders">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <input type="text" id="default-artist" class="input-number" style="width: 100%;">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 data-i18n="controls">Управление</h3>
+                <div class="control-buttons">
+                    <button id="btn-start" class="btn btn-success" onclick="startQueue()" disabled data-i18n="start">Старт</button>
+                    <button id="btn-pause" class="btn btn-warning" onclick="pauseQueue()" disabled data-i18n="pause">Пауза</button>
+                    <button id="btn-stop" class="btn btn-danger" onclick="stopQueue()" disabled data-i18n="stop">Стоп</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section stats-section">
+                <h3 data-i18n="stats">Статистика очереди</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-val" id="stat-scanned">0</span>
+                        <span class="stat-lbl" data-i18n="totalFiles">Всего файлов</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val text-success" id="stat-success">0</span>
+                        <span class="stat-lbl" data-i18n="success">Успешно</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val text-warning" id="stat-no-lyrics">0</span>
+                        <span class="stat-lbl" data-i18n="noTimings">Нет таймингов</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val text-info" id="stat-skipped">0</span>
+                        <span class="stat-lbl" data-i18n="skipped">Пропущено</span>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="queue-progress" class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="progress-text">0 / 0 (0%)</div>
+            </div>
+
+            <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: center;">
+                <a href="https://github.com/mbs0ft/WordByWord" target="_blank" style="color: var(--text-secondary); text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
+                    </svg>
+                    <span>GitHub / WordByWord</span>
+                </a>
+            </div>
+        </aside>
+
+<main class="main-content">
+            
+            <div id="meta-display" class="meta-info" style="margin-top: 32px; margin-bottom: 0;"></div>
+            <div id="manual-search" class="manual-search-row" style="display: none; margin-top: 16px;">
+                <input type="text" id="artist">
+                <input type="text" id="title">
+                <button onclick="downloadLyrics()" class="btn btn-secondary" data-i18n="downloadLrc">Скачать послоговый LRC</button>
+            </div>
+
+<div class="queue-section">
+                <div class="section-header">
+                    <h3 data-i18n="queueTitle">Очередь файлов</h3>
+                    <div class="filter-controls">
+                        <input type="text" id="queue-search" oninput="filterQueueTable()">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="queue-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="colFile">Файл</th>
+                                <th data-i18n="colArtist">Исполнитель</th>
+                                <th data-i18n="colTitle">Название</th>
+                                <th data-i18n="colSource">Источник метаданных</th>
+                                <th data-i18n="colStatus">Статус</th>
+                                <th data-i18n="colActions">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="queue-body">
+                            <tr>
+                                <td colspan="6" class="empty-table" id="empty-table-text" data-i18n="emptyTable">Папка не отсканирована. Выберите папку на панели слева.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+<div class="logs-section">
+                <h3 data-i18n="logsTitle">Лог событий</h3>
+                <div id="log"></div>
+            </div>
+        </main>
+    </div>
+
+<div id="settings-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-slider">
+                
+                <div class="modal-page" id="page-settings">
+                    <div class="modal-header">
+                        <h3 data-i18n="settings">Настройки</h3>
+                        <button class="modal-close-btn" onclick="closeSettingsModal()">&times;</button>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label data-i18n="language">Язык:</label>
+                        <select id="setting-lang" class="input-number" style="width: 100%;" onchange="autoSaveSettings()">
+                            <option value="en">English</option>
+                            <option value="ru">Русский</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <label data-i18n="theme">Тема оформления:</label>
+                        <select id="setting-theme" class="input-number" style="width: 100%;" onchange="autoSaveSettings()">
+                            <option value="system" data-i18n="themeSystem">Как в системе</option>
+                            <option value="light" data-i18n="themeLight">Светлая</option>
+                            <option value="dark" data-i18n="themeDark">Тёмная</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <label data-i18n="mxmToken">Токен Musixmatch:</label>
+                        <input type="password" id="setting-mxm-token" class="input-number" style="width: 100%;">
+                        <div style="font-size: 11px; display: flex; justify-content: flex-end; margin-top: 4px;">
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary);">
+                                <input type="checkbox" onchange="document.getElementById('setting-mxm-token').type = this.checked ? 'text' : 'password'" style="width: 12px; height: 12px;">
+                                <span data-i18n="showToken">Show</span>
+                            </label>
+                        </div>
+                        <details class="animated-details">
+                            <summary data-i18n="mxmHelpTitle">Как получить токен?</summary>
+                            <div class="details-content">
+                                <div class="animated-details-inner">
+                                    <p data-i18n="mxmHelpBody"></p>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="showAboutPage()" style="margin-top: 10px;" data-i18n="aboutProject">О проекте</button>
+                </div>
+
+<div class="modal-page" id="page-about">
+                    <div class="modal-header">
+                        <button class="btn-back" onclick="showSettingsPage()">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                            </svg>
+                            <span data-i18n="back">Назад</span>
+                        </button>
+                        <button class="modal-close-btn" onclick="closeSettingsModal()">&times;</button>
+                    </div>
+                    <div class="about-content" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; margin-top: 12px;">
+                        <img src="icons/logo.svg" alt="WordByWord" style="width: 64px; height: 64px; border-radius: 12px; margin-bottom: 4px;">
+                        <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">WordByWord</h2>
+                        <span class="version" style="font-size: 11px; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 12px; color: var(--text-secondary); font-weight: 600; margin-top: -4px;">v1.0</span>
+                        <p data-i18n="aboutDescription" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-top: 8px; white-space: normal;"></p>
+                        
+                        <div style="margin-top: 16px; width: 100%; border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; justify-content: center;">
+                            <a href="https://github.com/mbs0ft/WordByWord" target="_blank" style="color: var(--text-secondary); text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                    <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
+                                </svg>
+                                <span>GitHub / WordByWord</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div id="manual-search-modal" class="modal-overlay">
+        <div class="modal-card manual-search" id="manual-search-card">
+            <div class="modal-header">
+                <h3 data-i18n="manualSearchTitle">Ручной поиск</h3>
+                <button class="modal-close-btn" onclick="closeManualSearchModal()">&times;</button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
+                    <div class="setting-item">
+                        <label data-i18n="colArtist">Исполнитель</label>
+                        <input type="text" id="manual-artist" class="input-number" style="width: 100%;">
+                    </div>
+                    <div class="setting-item">
+                        <label data-i18n="colTitle">Название</label>
+                        <input type="text" id="manual-title" class="input-number" style="width: 100%;">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="performManualSearch()" data-i18n="searchButton">Найти</button>
+            </div>
+
+<div class="manual-search-results" id="manual-results-list">
+                
+            </div>
+        </div>
+    </div>
+
+<script src="app.js"></script>
+</body>
+</html>
