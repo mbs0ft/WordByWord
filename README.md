@@ -10,26 +10,20 @@ Built with modern browser capabilities like the File System Access API, it secur
 
 ## Features
 
-**Word-by-word Synced Lyrics (Enhanced LRC)**
+**Word-by-word Synced Lyrics (Enhanced LRC):**
 Automatically fetches precise, word-by-word synced lyrics from multiple sources so you can enjoy true karaoke experiences in compatible players (like Navidrome, Symfonium, Feishin, etc).
 
-**Multi-Source Fetching Engine**
+**Multi-Source Fetching Engine:**
 Queries multiple APIs sequentially to guarantee the highest quality match:
 1. **Apple Music ([LyricsPlus](https://github.com/ibratabian17/lyricsplus))**
 2. **Musixmatch**
 3. **[LRCLIB](https://lrclib.net/)**
 
-**Manual Match Search Helper**
+**Manual Match Search Helper:**
 Tags messed up? The built-in Manual Search lets you override track metadata, manually query all 3 databases, preview the un-timed text beautifully, and save the correct lyrics in one click.
 
-**Background Metadata Parsing**
+**Background Metadata Parsing:**
 As soon as you select a folder, WordByWord parses audio tags (ID3/FLAC) in the background asynchronously without freezing the UI, providing real-time data population in the queue table.
-
-**Beautiful Material You Design (MD3)**
-Enjoy a stunning, dynamic, and pastel-toned user interface built from scratch following Material Design 3 guidelines.
-- Fluid `.modal` animations and transitions.
-- Auto-detects System Theme (Light/Dark mode) on the fly, or manually select your preference.
-- Ink ripples and micro-animations throughout the app.
 
 ## How to Run
 
