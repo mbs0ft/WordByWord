@@ -4,6 +4,8 @@
 
 Built with modern browser capabilities like the File System Access API, it securely operates 100% locally on your machine without requiring any external servers or desktop application installations.
 
+<img width="1497" height="1021" alt="image" src="https://github.com/user-attachments/assets/7e0ce1ac-bd41-45bc-b8b7-3baf5b1fa81e" />
+
 **Try it now:** https://mb-soft.ru/WordByWord/
 
 ## Features
