@@ -4,7 +4,8 @@
 
 Built with modern browser capabilities like the File System Access API, it securely operates 100% locally on your machine without requiring any external servers or desktop application installations.
 
-<img width="1497" height="1021" alt="image" src="https://github.com/user-attachments/assets/7e0ce1ac-bd41-45bc-b8b7-3baf5b1fa81e" />
+<img width="1708" height="1147" alt="image" src="https://github.com/user-attachments/assets/61b84043-5239-42cb-959c-305bcc545353" />
+
 
 **Try it now:** https://mb-soft.ru/WordByWord/
 
@@ -15,21 +16,31 @@ Automatically fetches precise, word-by-word synced lyrics from multiple sources 
 
 **Multi-Source Fetching Engine:**
 Queries multiple APIs sequentially to guarantee the highest quality match:
-1. **Apple Music ([LyricsPlus](https://github.com/ibratabian17/lyricsplus))**
+1. **[LyricsPlus](https://github.com/ibratabian17/lyricsplus)**
 2. **Musixmatch**
 3. **[LRCLIB](https://lrclib.net/)**
+4. **[lrcmux](https://lrcmux.dev/)**
 
-**Manual Match Search Helper:**
-Tags messed up? The built-in Manual Search lets you override track metadata, manually query all 3 databases, preview the un-timed text beautifully, and save the correct lyrics in one click.
+- **Smart Featuring & Collaboration Artist Cleaning**
+  Automatically strips featured artist metadata (`feat.`, `ft.`, `&`, `vs.`) for fallback queries to primary artists, guaranteeing maximum match accuracy for collaborative tracks.
 
-**Background Metadata Parsing:**
-As soon as you select a folder, WordByWord parses audio tags (ID3/FLAC) in the background asynchronously without freezing the UI, providing real-time data population in the queue table.
+- **Interactive Manual Search & Real-Time Karaoke Player Preview**
+  Override track metadata manually, query all 4 databases, inspect duration match tags, and preview synced karaoke line/word highlighting with an interactive audio player.
+
+- **Smart Upgrade & Overwrite Protection**
+  Protect existing lyrics with flexible handling modes: **Upgrade to Enhanced** (only upgrades flat line-synced lyrics if word-by-word karaoke is found), **Skip All**, or **Always Overwrite**.
+
+- **Queue Filtering & Keyboard Shortcuts**
+  Filter queue items instantly by status (*All, Success, Instrumental, No Karaoke, Skipped*) with fixed column widths, `Ctrl+F` / `Cmd+F` search bar focus, and `Escape` quick modal closing.
+
+- **Settings Backup & Restore**
+  Export and import your complete settings configuration (`wordbyword-settings.json`) including provider order, Musixmatch token, theme, and language.
 
 ## How to Run
 
 WordByWord requires **zero installation** and **no build tools**. It relies purely on Vanilla JS, HTML, and CSS. 
 
-However, because it uses the powerful **File System Access API** to write `.lrc` files directly to your disk, modern browsers require it to run in a "Secure Context".
+Because it utilizes the **File System Access API** to write `.lrc` files directly to your disk, modern browsers require running in a **Secure Context** (`https://` or `localhost`).
 
 1. Clone or download this repository.
 2. Serve the folder using a local web server. 
@@ -38,4 +49,4 @@ However, because it uses the powerful **File System Access API** to write `.lrc`
 3. Click **Select Folder** in the top left, grant the browser permission to read/write, and watch the magic happen!
 
 ## Contributing
-Feel free to open issues or submit pull requests (or translations)!
+Pull requests, bug reports, and feature ideas are welcome! Feel free to open an issue or submit a PR on GitHub.
