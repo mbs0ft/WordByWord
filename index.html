@@ -24,7 +24,7 @@
             <div class="brand">
                 <div class="brand-logo-text">
                     <h2 data-i18n="title">WordByWord</h2>
-                    <span class="version">v1.0</span>
+                    <span class="version">v1.1</span>
                 </div>
                 <button class="btn-gear" onclick="openSettingsModal()" title="Settings">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -34,25 +34,23 @@
             </div>
 
             <div class="sidebar-section">
-                <h3 data-i18n="musicFolder">Музыкальная папка</h3>
-                <button id="btn-select-folder" class="btn btn-primary" onclick="selectLibraryFolder()">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                        <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                    </svg>
-                    <span data-i18n="selectFolder">Выбрать папку</span>
-                </button>
-                <div id="selected-folder-path" class="folder-path-display" data-i18n="folderNotSelected">Локальная папка не выбрана</div>
-            </div>
-
-            <div class="sidebar-section">
-                <h3 data-i18n="singleTrack">Одиночная обработка</h3>
-                <div id="drop-zone" class="file-zone-mini">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="color: var(--primary);">
-                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-                    </svg>
-                    <span data-i18n="dragSingle">Перетащите аудио сюда</span>
-                    <input type="file" id="audio-file" accept="audio/*" onchange="handleSingleFile(this.files[0])">
+                <h3 data-i18n="musicFolder">Музыкальная папка / файлы</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-select-folder" class="btn btn-primary" onclick="selectLibraryFolder()" style="flex: 1;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                        </svg>
+                        <span data-i18n="selectFolder">Выбрать папку</span>
+                    </button>
+                    <button id="btn-select-files" class="btn btn-secondary" onclick="document.getElementById('audio-files-input').click()" style="flex: 1;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                        </svg>
+                        <span data-i18n="selectFiles">Выбрать файлы</span>
+                    </button>
                 </div>
+                <input type="file" id="audio-files-input" accept="audio/*" multiple style="display:none;" onchange="handleMultipleFiles(this.files)">
+                <div id="selected-folder-path" class="folder-path-display" data-i18n="folderNotSelected">Папка не выбрана</div>
             </div>
 
             <div class="sidebar-section">
@@ -134,29 +132,37 @@
             </div>
         </aside>
 
-<main class="main-content">
-            
+        <main class="main-content">
             <div id="meta-display" class="meta-info" style="margin-top: 32px; margin-bottom: 0;"></div>
-            <div id="manual-search" class="manual-search-row" style="display: none; margin-top: 16px;">
-                <input type="text" id="artist">
-                <input type="text" id="title">
-                <button onclick="downloadLyrics()" class="btn btn-secondary" data-i18n="downloadLrc">Скачать послоговый LRC</button>
-            </div>
 
-<div class="queue-section">
-                <div class="section-header">
+            <div class="queue-section">
+                <div class="section-header" style="flex-wrap: wrap; gap: 12px;">
                     <h3 data-i18n="queueTitle">Очередь файлов</h3>
-                    <div class="filter-controls">
+                    <div class="status-filter-pills" id="status-filter-pills" style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="filter-pill active" onclick="setQueueStatusFilter('all')" data-status="all" data-i18n="filterAll">Все</button>
+                        <button type="button" class="filter-pill" onclick="setQueueStatusFilter('success')" data-status="success" data-i18n="statusSuccess">Успешно</button>
+                        <button type="button" class="filter-pill" onclick="setQueueStatusFilter('instrumental')" data-status="instrumental" data-i18n="statusInstrumental">Инструментал</button>
+                        <button type="button" class="filter-pill" onclick="setQueueStatusFilter('no_lyrics')" data-status="no_lyrics" data-i18n="statusNoLyrics">Без текста</button>
+                        <button type="button" class="filter-pill" onclick="setQueueStatusFilter('skipped')" data-status="skipped" data-i18n="statusSkipped">Пропущено</button>
+                    </div>
+                    <div class="filter-controls" style="display: flex; gap: 8px; align-items: center; margin-left: auto;">
                         <input type="text" id="queue-search" oninput="filterQueueTable()">
+                        <button id="btn-clear-queue" class="btn btn-secondary btn-sm" onclick="clearQueue()" style="width: auto; padding: 8px 14px; font-size: 12px; height: 38px; display: inline-flex; align-items: center; gap: 6px;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zM14 5h-3l-1-1H6L5 5H2v2h12z"/>
+                            </svg>
+                            <span data-i18n="clearQueue">Очистить очередь</span>
+                        </button>
                     </div>
                 </div>
-                <div class="table-container">
+                <div class="table-container" id="queue-table-container">
                     <table id="queue-table">
                         <thead>
                             <tr>
                                 <th data-i18n="colFile">Файл</th>
                                 <th data-i18n="colArtist">Исполнитель</th>
                                 <th data-i18n="colTitle">Название</th>
+                                <th data-i18n="colAlbum">Альбом</th>
                                 <th data-i18n="colSource">Источник метаданных</th>
                                 <th data-i18n="colStatus">Статус</th>
                                 <th data-i18n="colActions">Действия</th>
@@ -164,24 +170,24 @@
                         </thead>
                         <tbody id="queue-body">
                             <tr>
-                                <td colspan="6" class="empty-table" id="empty-table-text" data-i18n="emptyTable">Папка не отсканирована. Выберите папку на панели слева.</td>
+                                <td colspan="7" class="empty-table" id="empty-table-text" data-i18n="emptyTable">Очередь пуста. Выберите папку/файлы или перетащите их сюда.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-<div class="logs-section">
+            <div class="logs-section" id="logs-section">
+                <div class="resize-handle" id="log-resize-handle" title="Drag to resize logs"></div>
                 <h3 data-i18n="logsTitle">Лог событий</h3>
                 <div id="log"></div>
             </div>
         </main>
     </div>
 
-<div id="settings-modal" class="modal-overlay">
+    <div id="settings-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-slider">
-                
                 <div class="modal-page" id="page-settings">
                     <div class="modal-header">
                         <h3 data-i18n="settings">Настройки</h3>
@@ -198,12 +204,24 @@
 
                     <div class="setting-item">
                         <label data-i18n="theme">Тема оформления:</label>
-                        <select id="setting-theme" class="input-number" style="width: 100%;" onchange="autoSaveSettings()">
-                            <option value="system" data-i18n="themeSystem">Как в системе</option>
-                            <option value="light" data-i18n="themeLight">Светлая</option>
-                            <option value="dark" data-i18n="themeDark">Тёмная</option>
-                        </select>
+                        <div class="segmented-control" id="theme-segmented-control">
+                            <button type="button" class="segmented-btn" data-value="system" onclick="setThemeFromSegment('system')">
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M20 3H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h6l-2 3v1h8v-1l-2-3h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12H4V5h16v10z"/></svg>
+                                <span data-i18n="themeSystem">Система</span>
+                            </button>
+                            <div class="segmented-divider"></div>
+                            <button type="button" class="segmented-btn" data-value="light" onclick="setThemeFromSegment('light')">
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0zm-12.37 12.37l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0z"/></svg>
+                                <span data-i18n="themeLight">Светлая</span>
+                            </button>
+                            <div class="segmented-divider"></div>
+                            <button type="button" class="segmented-btn" data-value="dark" onclick="setThemeFromSegment('dark')">
+                                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                                <span data-i18n="themeDark">Тёмная</span>
+                            </button>
+                        </div>
                     </div>
+
 
                     <div class="setting-item">
                         <label data-i18n="mxmToken">Токен Musixmatch:</label>
@@ -224,10 +242,19 @@
                         </details>
                     </div>
 
-                    <button class="btn btn-secondary" onclick="showAboutPage()" style="margin-top: 10px;" data-i18n="aboutProject">О проекте</button>
+                    <div class="setting-item" style="margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                        <label data-i18n="backupRestore">Резервная копия настроек:</label>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <button type="button" class="btn btn-secondary" onclick="exportSettings()" style="flex: 1; font-size: 12px; padding: 8px 12px;" data-i18n="exportSettings">Экспорт</button>
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('settings-file-input').click()" style="flex: 1; font-size: 12px; padding: 8px 12px;" data-i18n="importSettings">Импорт</button>
+                        </div>
+                        <input type="file" id="settings-file-input" accept=".json" style="display: none;" onchange="importSettings(this.files[0])">
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="showAboutPage()" style="margin-top: 14px;" data-i18n="aboutProject">О проекте</button>
                 </div>
 
-<div class="modal-page" id="page-about">
+                <div class="modal-page" id="page-about">
                     <div class="modal-header">
                         <button class="btn-back" onclick="showSettingsPage()">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
@@ -240,7 +267,7 @@
                     <div class="about-content" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; margin-top: 12px;">
                         <img src="icons/logo.svg" alt="WordByWord" style="width: 64px; height: 64px; border-radius: 12px; margin-bottom: 4px;">
                         <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">WordByWord</h2>
-                        <span class="version" style="font-size: 11px; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 12px; color: var(--text-secondary); font-weight: 600; margin-top: -4px;">v1.0</span>
+                        <span class="version" style="font-size: 11px; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 12px; color: var(--text-secondary); font-weight: 600; margin-top: -4px;">v1.1</span>
                         <p data-i18n="aboutDescription" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-top: 8px; white-space: normal;"></p>
                         
                         <div style="margin-top: 16px; width: 100%; border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; justify-content: center;">
@@ -257,16 +284,15 @@
         </div>
     </div>
 
-<div id="manual-search-modal" class="modal-overlay">
+    <div id="manual-search-modal" class="modal-overlay">
         <div class="modal-card manual-search" id="manual-search-card">
             <div class="modal-header">
                 <h3 data-i18n="manualSearchTitle">Ручной поиск</h3>
                 <button class="modal-close-btn" onclick="closeManualSearchModal()">&times;</button>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%;">
                     <div class="setting-item">
                         <label data-i18n="colArtist">Исполнитель</label>
                         <input type="text" id="manual-artist" class="input-number" style="width: 100%;">
@@ -275,13 +301,18 @@
                         <label data-i18n="colTitle">Название</label>
                         <input type="text" id="manual-title" class="input-number" style="width: 100%;">
                     </div>
+                    <div class="setting-item">
+                        <label data-i18n="colAlbum">Альбом</label>
+                        <input type="text" id="manual-album" class="input-number" style="width: 100%;">
+                    </div>
                 </div>
+                
+                <div id="manual-track-duration-chip" class="track-duration-chip" style="display: none;"></div>
+
                 <button class="btn btn-primary" onclick="performManualSearch()" data-i18n="searchButton">Найти</button>
             </div>
 
-<div class="manual-search-results" id="manual-results-list">
-                
-            </div>
+            <div class="manual-search-results" id="manual-results-list"></div>
         </div>
     </div>
 
